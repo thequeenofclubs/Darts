@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Darts 501 Score Tracker</title>
+</head>
+<body>
+  <h1>Darts 501 Score Tracker</h1>
+
+  <div id="setup">
+    <label>How many players? 
+      <input type="number" id="playerCount" min="1" max="20" value="2">
+    </label>
+    <button id="createPlayersBtn">Create Players</button>
+    <div id="playerNames"></div>
+    <button id="startGameBtn" style="display:none;">Start Game</button>
+  </div>
+
+  <hr>
+
+  <div id="game" style="display:none;">
+    <div id="status"></div>
+    <div id="scores"></div>
+
+    <h2>Current Turn</h2>
+    <div id="turnInfo"></div>
+
+    <div id="dartInputs">
+      <label>Dart 1 (0–60): <input type="number" id="dart1" min="0" max="60"></label><br>
+      <label>Dart 2 (0–60): <input type="number" id="dart2" min="0" max="60"></label><br>
+      <label>Dart 3 (0–60): <input type="number" id="dart3" min="0" max="60"></label><br><br>
+      <button id="submitTurnBtn">Submit Turn</button>
+    </div>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Player model
+    class Player {
+      constructor(name) {
+        this.name = name;
+        this.score = 501;
+      }
+    }
+
+    let players = [];
+    let currentTurnIndex = 0;
+    let gameOver = false;
+
+    const playerCountInput = document.getElementById('playerCount');
+    const createPlayersBtn = document.getElementById('createPlayersBtn');
+    const playerNamesDiv = document.getElementById('playerNames');
+    const startGameBtn = document.getElementById('startGameBtn');
+
+    const gameDiv = document.getElementById('game');
+    const statusDiv = document.getElementById('status');
+    const scoresDiv = document.getElementById('scores');
+    const turnInfoDiv = document.getElementById('turnInfo');
+    const dart1Input = document.getElementById('dart1');
+    const dart2Input = document.getElementById('dart2');
+    const dart3Input = document.getElementById('dart3');
+    const submitTurnBtn = document.getElementById('submitTurnBtn');
+    const messageDiv = document.getElementById('message');
+
+    createPlayersBtn.addEventListener('click', () => {
+      const count = parseInt(playerCountInput.value, 10);
+      if (isNaN(count) || count < 1 || count > 20) {
+        alert('Enter a valid number of players (1–20).');
+        return;
+      }
+
+      playerNamesDiv.innerHTML = '';
+      players = [];
+
+      for (let i = 0; i < count; i++) {
+        const label = document.createElement('label');
+        label.textContent = 'Player ' + (i + 1) + ' name: ';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'playerName_' + i;
+        label.appendChild(input);
+        playerNamesDiv.appendChild(label);
+        playerNamesDiv.appendChild(document.createElement('br'));
+      }
+
+      startGameBtn.style.display = 'inline-block';
+    });
+
+    startGameBtn.addEventListener('click', () => {
+      players = [];
+      const count = parseInt(playerCountInput.value, 10);
+
+      for (let i = 0; i < count; i++) {
+        const nameInput = document.getElementById('playerName_' + i);
+        let name = nameInput.value.trim();
+        if (name === '') {
+          name = 'Player ' + (i + 1);
+        }
+        players.push(new Player(name));
+      }
+
+      currentTurnIndex = 0;
+      gameOver = false;
+      document.getElementById('setup').style.display = 'none';
+      gameDiv.style.display = 'block';
+      resetDartInputs();
+      updateUI();
+    });
+
+    submitTurnBtn.addEventListener('click', () => {
+      if (gameOver) return;
+
+      const dart1 = readDartValue(dart1Input);
+      const dart2 = readDartValue(dart2Input);
+      const dart3 = readDartValue(dart3Input);
+
+      if (dart1 === null || dart2 === null || dart3 === null) {
+        messageDiv.textContent = 'Each dart must be a number between 0 and 60.';
+        return;
+      }
+
+      const totalHit = dart1 + dart2 + dart3;
+      const player = players[currentTurnIndex];
+      const newScore = player.score - totalHit;
+
+      messageDiv.textContent = 'Total hit this turn: ' + totalHit + '. ';
+
+      if (newScore < 0) {
+        messageDiv.textContent += 'BUST! Score goes below zero. Turn score ignored.';
+      } else if (newScore === 0) {
+        player.score = newScore;
+        updateScores();
+        messageDiv.textContent += player.name + ' WINS THE GAME!';
+        gameOver = true;
+        disableInputs();
+        return;
+      } else {
+        player.score = newScore;
+        messageDiv.textContent += player.name + '\'s new score: ' + player.score + '.';
+      }
+
+      currentTurnIndex = (currentTurnIndex + 1) % players.length;
+      resetDartInputs();
+      updateUI();
+    });
+
+    function readDartValue(inputElement) {
+      const val = parseInt(inputElement.value, 10);
+      if (isNaN(val) || val < 0 || val > 60) {
+        return null;
+      }
+      return val;
+    }
+
+    function resetDartInputs() {
+      dart1Input.value = '';
+      dart2Input.value = '';
+      dart3Input.value = '';
+    }
+
+    function disableInputs() {
+      dart1Input.disabled = true;
+      dart2Input.disabled = true;
+      dart3Input.disabled = true;
+      submitTurnBtn.disabled = true;
+    }
+
+    function updateUI() {
+      updateStatus();
+      updateScores();
+      updateTurnInfo();
+    }
+
+    function updateStatus() {
+      statusDiv.textContent = 'Players: ' + players.map(p => p.name).join(', ');
+    }
+
+    function updateScores() {
+      scoresDiv.innerHTML = '<h2>Scores</h2>';
+      const ul = document.createElement('ul');
+      players.forEach((p, index) => {
+        const li = document.createElement('li');
+        li.textContent = p.name + ': ' + p.score + (index === currentTurnIndex && !gameOver ? ' ← current turn' : '');
+        ul.appendChild(li);
+      });
+      scoresDiv.appendChild(ul);
+    }
+
+    function updateTurnInfo() {
+      if (gameOver) {
+        turnInfoDiv.textContent = 'Game over.';
+      } else {
+        const player = players[currentTurnIndex];
+        turnInfoDiv.textContent = 'It\'s ' + player.name + '\'s turn. Current score: ' + player.score + '.';
+      }
+    }
+  </script>
+</body>
+</html>
