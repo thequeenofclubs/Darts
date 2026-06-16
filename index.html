@@ -2,159 +2,157 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Darts Score Tracker</title>
+  <title>Darts 501 Score Tracker</title>
+
+  <!-- ===========================
+       MOBILE + DESKTOP CSS
+       =========================== -->
   <style>
-  body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                 Roboto, Helvetica, Arial, sans-serif;
-    margin: 20px;
-    line-height: 1.5;
-  }
-
-  h1, h2 {
-    margin-bottom: 10px;
-  }
-
-  label {
-    display: block;
-    margin: 6px 0;
-  }
-
-  input[type="number"],
-  input[type="text"] {
-    padding: 4px 6px;
-    font-size: 14px;
-    margin-left: 6px;
-  }
-
-  button {
-    padding: 6px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-
-  #scores ul {
-    padding-left: 18px;
-  }
-
-  #message {
-    margin-top: 12px;
-    font-weight: 500;
-  }
-
-  hr {
-    margin: 20px 0;
-  }
-
-  #game, #setup {
-    max-width: 500px;
-  }
-</style>
-
-  <style>
-  /* Base typography */
-  body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                 Roboto, Helvetica, Arial, sans-serif;
-    margin: 16px;
-    line-height: 1.5;
-    max-width: 600px;
-  }
-
-  h1, h2 {
-    margin-bottom: 10px;
-  }
-
-  /* Make layout adapt to small screens */
-  body, #setup, #game {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  label {
-    display: block;
-    margin: 8px 0;
-  }
-
-  /* Touch-friendly inputs */
-  input[type="number"],
-  input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    margin-top: 4px;
-    box-sizing: border-box;
-  }
-
-  /* Buttons large enough for thumbs */
-  button {
-    padding: 12px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 12px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* Score list spacing */
-  #scores ul {
-    padding-left: 20px;
-  }
-
-  #message {
-    margin-top: 14px;
-    font-weight: 500;
-  }
-
-  hr {
-    margin: 20px 0;
-  }
-
-  /* Slight spacing between sections */
-  #setup, #game {
-    margin-bottom: 20px;
-  }
-
-  /* Prevent zooming on iOS when tapping inputs */
-  input[type="number"],
-  input[type="text"],
-  button {
-    font-size: 16px;
-  }
-
-  /* Make layout breathe on very small screens */
-  @media (max-width: 480px) {
+    /* Base typography */
     body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, Helvetica, Arial, sans-serif;
+      margin: 16px;
+      line-height: 1.5;
+      max-width: 600px;
+    }
+
+    h1, h2 {
+      margin-bottom: 10px;
+    }
+
+    /* Make layout adapt to small screens */
+    body, #setup, #game {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    label {
+      display: block;
+      margin: 8px 0;
+    }
+
+    /* Touch-friendly inputs */
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+
+    /* Buttons large enough for thumbs */
+    button {
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Score list spacing */
+    #scores ul {
+      padding-left: 20px;
+    }
+
+    #message {
+      margin-top: 14px;
+      font-weight: 500;
+    }
+
+    hr {
+      margin: 20px 0;
+    }
+
+    /* Prevent zooming on iOS when tapping inputs */
+    input[type="number"],
+    input[type="text"],
+    button {
+      font-size: 16px;
+    }
+
+    /* Mobile-only overrides */
+    body.mobile {
       margin: 12px;
+      font-size: 16px;
     }
 
-    h1 {
-      font-size: 22px;
-    }
-
-    h2 {
+    body.mobile input[type="number"],
+    body.mobile input[type="text"],
+    body.mobile button {
+      width: 100%;
+      padding: 12px;
       font-size: 18px;
     }
-  }
-</style>
 
+    /* Desktop-only overrides */
+    body.desktop {
+      max-width: 700px;
+      margin: 20px auto;
+    }
 
+    /* Extra breathing room on tiny screens */
+    @media (max-width: 480px) {
+      body {
+        margin: 12px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+
+  <!-- ===========================
+       MOBILE DETECTION SCRIPT
+       =========================== -->
+  <script>
+    function isMobileDevice() {
+      if (window.matchMedia("(max-width: 768px)").matches) return true;
+      const ua = navigator.userAgent.toLowerCase();
+      return /iphone|ipad|ipod|android|mobile|tablet/.test(ua);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (isMobileDevice()) {
+        document.body.classList.add("mobile");
+      } else {
+        document.body.classList.add("desktop");
+      }
+    });
+  </script>
 </head>
-<body>
-  <h1>Darts Score Tracker</h1>
 
+<body>
+
+  <h1>Darts 501 Score Tracker</h1>
+
+  <!-- ===========================
+       SETUP SCREEN
+       =========================== -->
   <div id="setup">
-    <label>How many players? 
+    <label>How many players?
       <input type="number" id="playerCount" min="1" max="20" value="2">
     </label>
+
     <button id="createPlayersBtn">Create Players</button>
+
     <div id="playerNames"></div>
+
     <button id="startGameBtn" style="display:none;">Start Game</button>
   </div>
 
   <hr>
 
+  <!-- ===========================
+       GAME SCREEN
+       =========================== -->
   <div id="game" style="display:none;">
     <div id="status"></div>
     <div id="scores"></div>
@@ -163,17 +161,19 @@
     <div id="turnInfo"></div>
 
     <div id="dartInputs">
-      <label>Dart 1 (0–60): <input type="number" id="dart1" min="0" max="60"></label><br>
-      <label>Dart 2 (0–60): <input type="number" id="dart2" min="0" max="60"></label><br>
-      <label>Dart 3 (0–60): <input type="number" id="dart3" min="0" max="60"></label><br><br>
+      <label>Dart 1 (0–60): <input type="number" id="dart1" min="0" max="60"></label>
+      <label>Dart 2 (0–60): <input type="number" id="dart2" min="0" max="60"></label>
+      <label>Dart 3 (0–60): <input type="number" id="dart3" min="0" max="60"></label>
       <button id="submitTurnBtn">Submit Turn</button>
     </div>
 
     <div id="message"></div>
   </div>
 
+  <!-- ===========================
+       GAME LOGIC SCRIPT
+       =========================== -->
   <script>
-    // Player model
     class Player {
       constructor(name) {
         this.name = name;
@@ -218,7 +218,6 @@
         input.id = 'playerName_' + i;
         label.appendChild(input);
         playerNamesDiv.appendChild(label);
-        playerNamesDiv.appendChild(document.createElement('br'));
       }
 
       startGameBtn.style.display = 'inline-block';
@@ -231,9 +230,7 @@
       for (let i = 0; i < count; i++) {
         const nameInput = document.getElementById('playerName_' + i);
         let name = nameInput.value.trim();
-        if (name === '') {
-          name = 'Player ' + (i + 1);
-        }
+        if (name === '') name = 'Player ' + (i + 1);
         players.push(new Player(name));
       }
 
@@ -264,7 +261,7 @@
       messageDiv.textContent = 'Total hit this turn: ' + totalHit + '. ';
 
       if (newScore < 0) {
-        messageDiv.textContent += 'BUST! Score goes below zero. Turn score ignored.';
+        messageDiv.textContent += 'BUST! Score goes below zero. Turn ignored.';
       } else if (newScore === 0) {
         player.score = newScore;
         updateScores();
@@ -284,9 +281,7 @@
 
     function readDartValue(inputElement) {
       const val = parseInt(inputElement.value, 10);
-      if (isNaN(val) || val < 0 || val > 60) {
-        return null;
-      }
+      if (isNaN(val) || val < 0 || val > 60) return null;
       return val;
     }
 
@@ -318,7 +313,8 @@
       const ul = document.createElement('ul');
       players.forEach((p, index) => {
         const li = document.createElement('li');
-        li.textContent = p.name + ': ' + p.score + (index === currentTurnIndex && !gameOver ? ' ← current turn' : '');
+        li.textContent = p.name + ': ' + p.score +
+          (index === currentTurnIndex && !gameOver ? ' ← current turn' : '');
         ul.appendChild(li);
       });
       scoresDiv.appendChild(ul);
@@ -329,13 +325,11 @@
         turnInfoDiv.textContent = 'Game over.';
       } else {
         const player = players[currentTurnIndex];
-        turnInfoDiv.textContent = 'It\'s ' + player.name + '\'s turn. Current score: ' + player.score + '.';
+        turnInfoDiv.textContent =
+          'It\'s ' + player.name + '\'s turn. Current score: ' + player.score + '.';
       }
     }
   </script>
 
 </body>
-
-
-  
 </html>
