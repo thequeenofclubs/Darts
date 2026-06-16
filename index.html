@@ -1,117 +1,554 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Darts 501 Score Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ===========================
-       MOBILE + DESKTOP CSS
-       =========================== -->
   <style>
-    /* Base typography */
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   Roboto, Helvetica, Arial, sans-serif;
-      margin: 16px;
-      line-height: 1.5;
-      max-width: 600px;
+    :root {
+      --bg: #05060a;
+      --bg-elevated: rgba(18, 22, 30, 0.85);
+      --accent: #0a84ff;
+      --accent-soft: rgba(10, 132, 255, 0.18);
+      --accent-secondary: #ff9f0a;
+      --danger: #ff3b30;
+      --text-primary: #f5f7ff;
+      --text-secondary: #a7b0c5;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --glass: rgba(18, 22, 30, 0.75);
+      --glass-strong: rgba(18, 22, 30, 0.92);
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
+      --radius-card: 18px;
+      --radius-pill: 999px;
+      --transition-fast: 0.18s ease-out;
+      --transition-med: 0.25s ease-out;
     }
 
-    h1, h2 {
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                   "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at top, #1b2335 0%, #05060a 55%, #020308 100%);
+      color: var(--text-primary);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 900px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 4px;
+    }
+
+    .app-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .app-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-title-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 30% 20%, #ffd60a 0%, #ff9f0a 40%, #ff3b30 100%);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 10px 25px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .app-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .app-badge {
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(135deg, rgba(10, 132, 255, 0.18), rgba(10, 132, 255, 0.05));
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .app-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.25);
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 780px) {
+      body {
+        padding: 16px;
+      }
+      .layout-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: var(--glass);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      padding: 18px 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(10, 132, 255, 0.18) 0%, transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(255, 159, 10, 0.18) 0%, transparent 55%);
+      opacity: 0.35;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .card-pill {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(10, 132, 255, 0.08);
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .field-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      appearance: none;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      color: var(--text-primary);
+      padding: 9px 11px;
+      font-size: 14px;
+      outline: none;
+      width: 100%;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.6), 0 0 0 8px rgba(10, 132, 255, 0.18);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+      transform: translateY(-0.5px);
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+      outline: none;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), opacity var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0a84ff, #4f9dff);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(10, 132, 255, 0.45);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(10, 132, 255, 0.6);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba(10, 132, 255, 0.5);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      color: var(--text-primary);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(0);
+    }
+
+    .btn-small {
+      padding: 7px 11px;
+      font-size: 12px;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff3b30, #ff453a);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(255, 59, 48, 0.45);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .setup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .player-names-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .player-name-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .player-name-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
       margin-bottom: 10px;
     }
 
-    /* Make layout adapt to small screens */
-    body, #setup, #game {
-      width: 100%;
-      box-sizing: border-box;
+    .status-chip {
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      font-size: 11px;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    label {
-      display: block;
-      margin: 8px 0;
+    .status-chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.25);
     }
 
-    /* Touch-friendly inputs */
-    input[type="number"],
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
+    .status-chip-danger-dot {
+      background: var(--danger);
+      box-shadow: 0 0 0 4px rgba(255, 59, 48, 0.25);
+    }
+
+    .scores-panel {
+      margin-top: 6px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+      padding: 10px 10px 8px;
+    }
+
+    .scores-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .scores-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+    }
+
+    .scores-mode {
+      font-size: 11px;
+      color: var(--accent-secondary);
+    }
+
+    .scores-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .score-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+      gap: 6px;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 10px;
+      transition: background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .score-item-current {
+      background: radial-gradient(circle at 0% 0%, rgba(10, 132, 255, 0.22), transparent 70%);
+      transform: translateY(-0.5px);
+    }
+
+    .score-name {
+      font-size: 13px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .score-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(10, 132, 255, 0.18);
+      color: var(--accent);
+    }
+
+    .score-value {
       font-size: 16px;
-      margin-top: 4px;
-      box-sizing: border-box;
+      font-weight: 600;
+      text-align: right;
+      color: var(--text-primary);
     }
 
-    /* Buttons large enough for thumbs */
-    button {
-      padding: 12px 16px;
+    .score-value-zero {
+      color: var(--accent-secondary);
+    }
+
+    .turn-panel {
+      margin-top: 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+      padding: 10px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .turn-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+    }
+
+    .turn-player-line {
+      font-size: 14px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .turn-player-name {
+      font-weight: 600;
+    }
+
+    .turn-player-score {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .dart-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 520px) {
+      .dart-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .dart-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .message-banner {
+      margin-top: 8px;
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(135deg, rgba(10, 132, 255, 0.12), rgba(10, 132, 255, 0.04));
+      color: var(--text-primary);
+      min-height: 32px;
+    }
+
+    .message-icon {
       font-size: 16px;
-      cursor: pointer;
-      margin-top: 12px;
-      width: 100%;
-      box-sizing: border-box;
     }
 
-    /* Score list spacing */
-    #scores ul {
-      padding-left: 20px;
+    .message-text {
+      flex: 1;
     }
 
-    #message {
-      margin-top: 14px;
-      font-weight: 500;
+    .message-muted {
+      color: var(--text-secondary);
     }
 
-    hr {
-      margin: 20px 0;
+    .message-danger {
+      background: linear-gradient(135deg, rgba(255, 59, 48, 0.16), rgba(255, 59, 48, 0.06));
+      border-color: rgba(255, 59, 48, 0.4);
     }
 
-    /* Prevent zooming on iOS when tapping inputs */
-    input[type="number"],
-    input[type="text"],
-    button {
-      font-size: 16px;
+    .message-success {
+      background: linear-gradient(135deg, rgba(52, 199, 89, 0.16), rgba(52, 199, 89, 0.06));
+      border-color: rgba(52, 199, 89, 0.4);
     }
 
-    /* Mobile-only overrides */
-    body.mobile {
-      margin: 12px;
-      font-size: 32px;
+    .footer-note {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: right;
+      margin-top: 6px;
     }
 
-    body.mobile input[type="number"],
-    body.mobile input[type="text"],
-    body.mobile button {
-      width: 100%;
-      padding: 12px;
-      font-size: 32px;
-    }
-
-    /* Desktop-only overrides */
-    body.desktop {
-      max-width: 700px;
-      margin: 20px auto;
-    }
-
-    /* Extra breathing room on tiny screens */
-    @media (max-width: 480px) {
-      body {
-        margin: 12px;
-      }
-
-      h1 {
-        font-size: 50px;
-      }
-
-      h2 {
-        font-size: 36px;
-      }
+    .footer-note span {
+      color: var(--accent-secondary);
     }
   </style>
 
-  <!-- ===========================
-       MOBILE DETECTION SCRIPT
-       =========================== -->
   <script>
     function isMobileDevice() {
       if (window.matchMedia("(max-width: 768px)").matches) return true;
@@ -130,49 +567,130 @@
 </head>
 
 <body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-title-group">
+        <div class="app-title">
+          <div class="app-title-icon">501</div>
+          Darts Score Tracker
+        </div>
+        <div class="app-subtitle">
+          Multi‑player 501, per‑dart input, bust detection, clean turn rotation.
+        </div>
+      </div>
+      <div class="app-badge">
+        <span class="app-badge-dot"></span>
+        Live Game
+      </div>
+    </header>
 
-  <h1>Darts 501 Score Tracker</h1>
+    <main class="layout-grid">
+      <!-- SETUP CARD -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-title">Game setup</div>
+            <div class="card-pill">Step 1 · Players & names</div>
+          </div>
 
-  <!-- ===========================
-       SETUP SCREEN
-       =========================== -->
-  <div id="setup">
-    <label>How many players?
-      <input type="number" id="playerCount" min="1" max="20" value="2">
-    </label>
+          <div class="section" id="setup">
+            <div class="field-group">
+              <div class="field-label">Number of players</div>
+              <div class="field-row">
+                <input type="number" id="playerCount" min="1" max="20" value="2" />
+              </div>
+            </div>
 
-    <button id="createPlayersBtn">Create Players</button>
+            <div class="setup-actions">
+              <button class="btn-secondary btn-small" id="createPlayersBtn">
+                <span>Generate name fields</span>
+              </button>
+            </div>
 
-    <div id="playerNames"></div>
+            <div id="playerNames" class="player-names-list"></div>
 
-    <button id="startGameBtn" style="display:none;">Start Game</button>
+            <div class="setup-actions">
+              <button class="btn-primary" id="startGameBtn" style="display:none;">
+                <span>Start 501 game</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GAME CARD -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-title">Live scoreboard</div>
+            <div class="card-pill">Step 2 · Turns & darts</div>
+          </div>
+
+          <div id="game" style="display:none;">
+            <div class="status-bar">
+              <div class="status-chip" id="status">
+                <span class="status-chip-dot"></span>
+                Players: —
+              </div>
+              <div class="status-chip">
+                <span>Mode:</span>
+                <strong>501 · Straight‑out</strong>
+              </div>
+            </div>
+
+            <div class="scores-panel">
+              <div class="scores-header">
+                <div class="scores-title">Scores</div>
+                <div class="scores-mode">Current leg</div>
+              </div>
+              <ul class="scores-list" id="scores"></ul>
+            </div>
+
+            <div class="turn-panel">
+              <div class="turn-title">Current turn</div>
+              <div class="turn-player-line" id="turnInfo">
+                <span class="turn-player-name">—</span>
+                <span class="turn-player-score">Score: —</span>
+              </div>
+
+              <div class="dart-grid" id="dartInputs">
+                <div>
+                  <div class="dart-label">Dart 1 (0–60)</div>
+                  <input type="number" id="dart1" min="0" max="60" />
+                </div>
+                <div>
+                  <div class="dart-label">Dart 2 (0–60)</div>
+                  <input type="number" id="dart2" min="0" max="60" />
+                </div>
+                <div>
+                  <div class="dart-label">Dart 3 (0–60)</div>
+                  <input type="number" id="dart3" min="0" max="60" />
+                </div>
+              </div>
+
+              <div class="setup-actions">
+                <button class="btn-primary" id="submitTurnBtn">
+                  <span>Submit turn</span>
+                </button>
+              </div>
+
+              <div class="message-banner" id="message">
+                <div class="message-icon">🎯</div>
+                <div class="message-text message-muted">
+                  Enter three dart scores to begin the first turn.
+                </div>
+              </div>
+            </div>
+
+            <div class="footer-note">
+              501 · <span>Per‑dart input</span> · Bust restores previous score · Exact 0 wins.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <hr>
-
-  <!-- ===========================
-       GAME SCREEN
-       =========================== -->
-  <div id="game" style="display:none;">
-    <div id="status"></div>
-    <div id="scores"></div>
-
-    <h2>Current Turn</h2>
-    <div id="turnInfo"></div>
-
-    <div id="dartInputs">
-      <label>Dart 1 (0–60): <input type="number" id="dart1" min="0" max="60"></label>
-      <label>Dart 2 (0–60): <input type="number" id="dart2" min="0" max="60"></label>
-      <label>Dart 3 (0–60): <input type="number" id="dart3" min="0" max="60"></label>
-      <button id="submitTurnBtn">Submit Turn</button>
-    </div>
-
-    <div id="message"></div>
-  </div>
-
-  <!-- ===========================
-       GAME LOGIC SCRIPT
-       =========================== -->
   <script>
     class Player {
       constructor(name) {
@@ -211,16 +729,24 @@
       players = [];
 
       for (let i = 0; i < count; i++) {
-        const label = document.createElement('label');
-        label.textContent = 'Player ' + (i + 1) + ' name: ';
+        const row = document.createElement('div');
+        row.className = 'player-name-row';
+
+        const label = document.createElement('div');
+        label.className = 'player-name-label';
+        label.textContent = 'Player ' + (i + 1);
+
         const input = document.createElement('input');
         input.type = 'text';
         input.id = 'playerName_' + i;
-        label.appendChild(input);
-        playerNamesDiv.appendChild(label);
+        input.placeholder = 'Name';
+
+        row.appendChild(label);
+        row.appendChild(input);
+        playerNamesDiv.appendChild(row);
       }
 
-      startGameBtn.style.display = 'inline-block';
+      startGameBtn.style.display = 'inline-flex';
     });
 
     startGameBtn.addEventListener('click', () => {
@@ -229,17 +755,24 @@
 
       for (let i = 0; i < count; i++) {
         const nameInput = document.getElementById('playerName_' + i);
-        let name = nameInput.value.trim();
+        let name = nameInput ? nameInput.value.trim() : '';
         if (name === '') name = 'Player ' + (i + 1);
         players.push(new Player(name));
       }
 
+      if (players.length === 0) {
+        alert('Please create at least one player.');
+        return;
+      }
+
       currentTurnIndex = 0;
       gameOver = false;
-      document.getElementById('setup').style.display = 'none';
+      document.getElementById('setup').style.opacity = '0.35';
+      document.getElementById('setup').style.pointerEvents = 'none';
       gameDiv.style.display = 'block';
       resetDartInputs();
       updateUI();
+      setMessage('🎯', 'Game started. ' + players[0].name + ' throws first.', 'info');
     });
 
     submitTurnBtn.addEventListener('click', () => {
@@ -250,7 +783,7 @@
       const dart3 = readDartValue(dart3Input);
 
       if (dart1 === null || dart2 === null || dart3 === null) {
-        messageDiv.textContent = 'Each dart must be a number between 0 and 60.';
+        setMessage('⚠️', 'Each dart must be a number between 0 and 60.', 'danger');
         return;
       }
 
@@ -258,20 +791,21 @@
       const player = players[currentTurnIndex];
       const newScore = player.score - totalHit;
 
-      messageDiv.textContent = 'Total hit this turn: ' + totalHit + '. ';
-
       if (newScore < 0) {
-        messageDiv.textContent += 'BUST! Score goes below zero. Turn ignored.';
+        setMessage('💥', 'Total hit: ' + totalHit + '. Bust! Score would go below zero, turn ignored.', 'danger');
       } else if (newScore === 0) {
         player.score = newScore;
         updateScores();
-        messageDiv.textContent += player.name + ' WINS THE GAME!';
+        setMessage('🏆', player.name + ' wins the leg with a total hit of ' + totalHit + '!', 'success');
         gameOver = true;
         disableInputs();
+        statusDiv.innerHTML =
+          '<span class="status-chip-dot status-chip-danger-dot"></span> Game over · Winner: ' +
+          player.name;
         return;
       } else {
         player.score = newScore;
-        messageDiv.textContent += player.name + '\'s new score: ' + player.score + '.';
+        setMessage('🎯', player.name + ' hits ' + totalHit + ' this turn. New score: ' + player.score + '.', 'info');
       }
 
       currentTurnIndex = (currentTurnIndex + 1) % players.length;
@@ -305,31 +839,69 @@
     }
 
     function updateStatus() {
-      statusDiv.textContent = 'Players: ' + players.map(p => p.name).join(', ');
+      statusDiv.innerHTML =
+        '<span class="status-chip-dot"></span> Players: ' +
+        players.map(p => p.name).join(', ');
     }
 
     function updateScores() {
-      scoresDiv.innerHTML = '<h2>Scores</h2>';
+      scoresDiv.innerHTML = '';
       const ul = document.createElement('ul');
+      ul.className = 'scores-list';
+
       players.forEach((p, index) => {
         const li = document.createElement('li');
-        li.textContent = p.name + ': ' + p.score +
-          (index === currentTurnIndex && !gameOver ? ' ← current turn' : '');
+        li.className = 'score-item' +
+          (index === currentTurnIndex && !gameOver ? ' score-item-current' : '');
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'score-name';
+        nameDiv.textContent = p.name;
+
+        if (index === currentTurnIndex && !gameOver) {
+          const tag = document.createElement('span');
+          tag.className = 'score-tag';
+          tag.textContent = 'Current turn';
+          nameDiv.appendChild(tag);
+        }
+
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'score-value' + (p.score === 0 ? ' score-value-zero' : '');
+        valueDiv.textContent = p.score;
+
+        li.appendChild(nameDiv);
+        li.appendChild(valueDiv);
         ul.appendChild(li);
       });
+
       scoresDiv.appendChild(ul);
     }
 
     function updateTurnInfo() {
       if (gameOver) {
-        turnInfoDiv.textContent = 'Game over.';
+        turnInfoDiv.innerHTML =
+          '<span class="turn-player-name">Game over</span>' +
+          '<span class="turn-player-score">Start a new leg to continue.</span>';
       } else {
         const player = players[currentTurnIndex];
-        turnInfoDiv.textContent =
-          'It\'s ' + player.name + '\'s turn. Current score: ' + player.score + '.';
+        turnInfoDiv.innerHTML =
+          '<span class="turn-player-name">' + player.name + '</span>' +
+          '<span class="turn-player-score">Score: ' + player.score + '</span>';
       }
     }
-  </script>
 
+    function setMessage(icon, text, type) {
+      messageDiv.className = 'message-banner';
+      if (type === 'danger') {
+        messageDiv.classList.add('message-danger');
+      } else if (type === 'success') {
+        messageDiv.classList.add('message-success');
+      }
+
+      messageDiv.innerHTML =
+        '<div class="message-icon">' + icon + '</div>' +
+        '<div class="message-text">' + text + '</div>';
+    }
+  </script>
 </body>
 </html>
