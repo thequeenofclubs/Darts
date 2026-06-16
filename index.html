@@ -2,10 +2,59 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Darts 501 Score Tracker</title>
+  <title>Darts Score Tracker</title>
+  <style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, Helvetica, Arial, sans-serif;
+    margin: 20px;
+    line-height: 1.5;
+  }
+
+  h1, h2 {
+    margin-bottom: 10px;
+  }
+
+  label {
+    display: block;
+    margin: 6px 0;
+  }
+
+  input[type="number"],
+  input[type="text"] {
+    padding: 4px 6px;
+    font-size: 14px;
+    margin-left: 6px;
+  }
+
+  button {
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  #scores ul {
+    padding-left: 18px;
+  }
+
+  #message {
+    margin-top: 12px;
+    font-weight: 500;
+  }
+
+  hr {
+    margin: 20px 0;
+  }
+
+  #game, #setup {
+    max-width: 500px;
+  }
+</style>
+
 </head>
 <body>
-  <h1>Darts 501 Score Tracker</h1>
+  <h1>Darts Score Tracker</h1>
 
   <div id="setup">
     <label>How many players? 
@@ -196,5 +245,9 @@
       }
     }
   </script>
+
 </body>
+
+
+  
 </html>
